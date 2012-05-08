@@ -255,12 +255,37 @@ class I18nRouter extends Router
     public function getRouteCollection()
     {
         $collection = parent::getRouteCollection();
-
-        return $this->container->get($this->i18nLoaderId)->load($collection);
+        $currentLocale = $this->context->getParameter('_locale');
+        if ($currentLocale) {
+            $locale = $currentLocale;
+        } else {
+            $locale = $this->defaultLocale;
+        }
+        return new RouteCollectionProxy($this->container->get($this->i18nLoaderId)->load($collection), $locale);
     }
 
     public function getOriginalRouteCollection()
     {
         return parent::getRouteCollection();
     }
+}
+
+class RouteCollectionProxy extends \Symfony\Component\Routing\RouteCollection{
+
+    private $_locale;
+
+    public function __construct($collection, $locale) {
+        parent::__construct();
+        $this->addCollection($collection);
+        $this->_locale = $locale;
+    }
+
+    public function get($name){
+        $route = parent::get($name);
+        if (empty($route)) {
+            $route = parent::get($this->_locale . '_' . $name);
+        }
+        return $route;
+    }
+
 }
