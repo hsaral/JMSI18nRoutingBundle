@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
+
 /**
  * I18n Router implementation.
  *
@@ -283,7 +284,7 @@ class RouteCollectionProxy extends \Symfony\Component\Routing\RouteCollection{
     public function get($name){
         $route = parent::get($name);
         if (empty($route)) {
-            $route = parent::get($this->_locale . '_' . $name);
+            $route = parent::get($this->_locale . I18nLoader::ROUTING_PREFIX . $name);
         }
         return $route;
     }
